@@ -154,8 +154,5 @@ if buscar_btn:
 
 
 st.markdown("---")
-st.caption(" Conectado a Last.fm API | Creado con Streamlit")
 
-if not API_KEY or API_KEY == "3b1c697b680f2aff22367d562508bff4":
-    st.sidebar.warning(" **Configura tu API Key**")
-    st.sidebar.info("Una vez que tengas tu API Key de Last.fm, reemplázala en la línea 8 del código.")
+
