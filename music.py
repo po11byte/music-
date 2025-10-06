@@ -2,11 +2,11 @@ import streamlit as st
 import requests
 
 st.set_page_config(page_title="Music Explorer", layout="centered")
-st.title(" Music Explorer")
+st.title("🎵 Music Explorer")
 st.write("Busca información sobre artistas y canciones usando Last.fm API")
 
 
-API_KEY = "	3b1c697b680f2aff22367d562508bff4"  
+API_KEY = "3b1c697b680f2aff22367d562508bff4" 
 
 def buscar_musica(tipo, query):
     """Buscar música en Last.fm API"""
@@ -31,9 +31,21 @@ def buscar_musica(tipo, query):
         st.error(f"Error de conexión: {e}")
         return None
 
+def mostrar_imagen_segura(imagen_data, width=100):
+    """Muestra imágenes de manera segura, manejando URLs vacías"""
+    if (imagen_data and len(imagen_data) > 2 and 
+        imagen_data[2]["#text"] and 
+        imagen_data[2]["#text"].startswith('http')):
+        try:
+            st.image(imagen_data[2]["#text"], width=width)
+        except:
+            st.image("https://via.placeholder.com/100x100/333333/FFFFFF?text=🎵", width=width)
+    else:
+        st.image("https://via.placeholder.com/100x100/333333/FFFFFF?text=🎵", width=width)
+
 
 with st.sidebar:
-    st.header(" Configuración")
+    st.header("⚙️ Configuración")
     tipo_busqueda = st.selectbox(
         "Tipo de búsqueda:",
         ["Artistas", "Canciones", "Álbumes"]
@@ -47,26 +59,25 @@ with st.sidebar:
         metodo = "album"
 
 
-busqueda = st.text_input(" Escribe el nombre del artista, canción o álbum:")
+busqueda = st.text_input("🔍 Escribe el nombre del artista, canción o álbum:")
 
 col1, col2 = st.columns([1, 1])
 with col1:
-    buscar_btn = st.button(" Buscar Música", use_container_width=True)
+    buscar_btn = st.button("🎵 Buscar Música", use_container_width=True)
 with col2:
-    if st.button(" Limpiar", use_container_width=True):
+    if st.button("🧹 Limpiar", use_container_width=True):
         st.rerun()
-
 
 if buscar_btn:
     if not API_KEY or API_KEY == "a3df7d1c2f8a4b5e6c7d8e9f0a1b2c3d":
         st.error(" **Configura tu API Key de Last.fm**")
         st.info("""
-        **Cómo obtener tu API Key:**
+        **📝 Cómo obtener tu API Key:**
         
-        1.  **Ve a:** https://www.last.fm/api
-        2.  **Inicia sesión o regístrate** (gratis)
-        3.  **Haz clic en:** "Get an API account"
-        4.  **Llena el formulario:**
+        1. 🌐 **Ve a:** https://www.last.fm/api
+        2. 👤 **Inicia sesión o regístrate** (gratis)
+        3. 🔑 **Haz clic en:** "Get an API account"
+        4. 📝 **Llena el formulario:**
            - App name: "Music Explorer"
            - Description: "App personal de música"
            - Organization: "Personal"
@@ -77,7 +88,7 @@ if buscar_btn:
         st.warning(" Por favor, escribe algo para buscar")
         
     else:
-        with st.spinner(f" Buscando {tipo_busqueda.lower()}..."):
+        with st.spinner(f"🔍 Buscando {tipo_busqueda.lower()}..."):
             resultados = buscar_musica(metodo, busqueda)
             
             if resultados:
@@ -90,8 +101,7 @@ if buscar_btn:
                             with st.container():
                                 col1, col2 = st.columns([1, 3])
                                 with col1:
-                                    if artist.get("image") and len(artist["image"]) > 2:
-                                        st.image(artist["image"][2]["#text"], width=100)
+                                    mostrar_imagen_segura(artist.get("image"), width=100)
                                 with col2:
                                     st.subheader(artist["name"])
                                     if artist.get("listeners"):
@@ -102,7 +112,7 @@ if buscar_btn:
                     else:
                         st.warning(f" No se encontraron artistas para: '{busqueda}'")
                 
-               
+                
                 elif metodo == "track":
                     tracks = resultados.get("results", {}).get("trackmatches", {}).get("track", [])
                     if tracks:
@@ -111,18 +121,17 @@ if buscar_btn:
                             with st.container():
                                 col1, col2 = st.columns([1, 3])
                                 with col1:
-                                    if track.get("image") and len(track["image"]) > 2:
-                                        st.image(track["image"][2]["#text"], width=100)
+                                    mostrar_imagen_segura(track.get("image"), width=100)
                                 with col2:
                                     st.subheader(track["name"])
                                     st.write(f" **Artista:** {track.get('artist', 'N/A')}")
                                     if track.get("url"):
-                                        st.markdown(f"[🔗 Escuchar preview]({track['url']})")
+                                        st.markdown(f"[ Escuchar preview]({track['url']})")
                                 st.markdown("---")
                     else:
                         st.warning(f" No se encontraron canciones para: '{busqueda}'")
                 
-                
+               
                 elif metodo == "album":
                     albums = resultados.get("results", {}).get("albummatches", {}).get("album", [])
                     if albums:
@@ -131,8 +140,7 @@ if buscar_btn:
                             with st.container():
                                 col1, col2 = st.columns([1, 3])
                                 with col1:
-                                    if album.get("image") and len(album["image"]) > 2:
-                                        st.image(album["image"][2]["#text"], width=100)
+                                    mostrar_imagen_segura(album.get("image"), width=100)
                                 with col2:
                                     st.subheader(album["name"])
                                     st.write(f" **Artista:** {album.get('artist', 'N/A')}")
@@ -142,13 +150,12 @@ if buscar_btn:
                     else:
                         st.warning(f" No se encontraron álbumes para: '{busqueda}'")
             else:
-                st.error(" Error al conectar con Last.fm API")
+                st.error("Error al conectar con Last.fm API")
 
 
 st.markdown("---")
 st.caption(" Conectado a Last.fm API | Creado con Streamlit")
 
-
 if not API_KEY or API_KEY == "3b1c697b680f2aff22367d562508bff4":
-    st.sidebar.warning("**Configura tu API Key**")
+    st.sidebar.warning(" **Configura tu API Key**")
     st.sidebar.info("Una vez que tengas tu API Key de Last.fm, reemplázala en la línea 8 del código.")
